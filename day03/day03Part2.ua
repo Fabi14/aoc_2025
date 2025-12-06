@@ -1,5 +1,5 @@
 # https://adventofcode.com/2025/day/3
-# Part 1
+# Part 2
 ParseLine  ← ⋕⊜∘+₁⇡⊸⧻°□ # ⇌⊥₁₀⋕
 SplitLines ← ⊜□¬⊸⌕@\n
 
