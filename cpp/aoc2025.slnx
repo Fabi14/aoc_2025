@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="aoc2025/aoc2025.vcxproj" Id="d6626b58-e6bb-4e3f-b53b-a1b70c468cba" />
+</Solution>
