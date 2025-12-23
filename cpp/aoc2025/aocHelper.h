@@ -12,6 +12,17 @@ namespace aoc
         return i < 0 ? -i : i;
     }
 
+    template<typename T>
+    constexpr T svto(std::string_view const& sv)
+    {
+        if (T value; std::from_chars(sv.data(), sv.data() + sv.size(), value).ec == std::errc{})
+        {
+            return value;
+        }
+
+        throw std::invalid_argument("not a number");
+    }
+
     class Timer
     {
     public:

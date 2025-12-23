@@ -8,19 +8,11 @@
 #include <functional>
 #include <vector>
 
-constexpr int svtoi(std::string_view const& sv)
-{
-    if (int value; std::from_chars(sv.data(), sv.data() + sv.size(), value).ec == std::errc{})
-    {
-        return value;
-    }
 
-    throw std::invalid_argument("not a number");
-}
 
 constexpr auto parseLine = [](std::string_view const& line)
     {
-        auto const distance = svtoi(line.substr(1));
+        auto const distance = aoc:: svto<int>(line.substr(1));
         return line[0] == 'L' ? -distance : distance;
     };
 

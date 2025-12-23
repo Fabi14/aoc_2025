@@ -4,9 +4,8 @@
 #include <string>
 #include <print>
 #include <filesystem>
-#include <numeric>
-#include <functional>
 #include <vector>
+#include <string_view>
 
 struct FreshIDRange
 {
@@ -14,56 +13,14 @@ struct FreshIDRange
 	long long int lastID{};
 };
 
-long long part1(const std::string& input)
+
+constexpr std::vector<FreshIDRange> createMergedRages(const std::string& input)
 {
+	using namespace std::views;
 	std::vector<FreshIDRange> freshIDs{};
 
-	using namespace std::views;
-
 	auto notEmptyline = [](auto line) {return std::ranges::distance(line) != 0; };
-	auto toInt = [](auto line) {return std::stoll(std::string(std::string_view(line))); };
-
-
-	for (const auto& line : input
-		| std::views::split('\n')
-		| std::views::take_while(notEmptyline))
-	{
-		auto range = line | split('-');
-		freshIDs.push_back(FreshIDRange{
-		.firstID = toInt(*range.begin()),
-		.lastID = toInt(*std::next(range.begin()))
-			});
-	}
-	long long sum{ 0 };
-	for (const auto& id : input | split('\n')
-		| drop_while(notEmptyline)
-		| drop(1)
-		| transform(toInt))
-	{
-		auto it = std::ranges::find_if(freshIDs, [id](const FreshIDRange& range)
-			{
-				return id >= range.firstID && id <= range.lastID;
-			});
-		if (it != freshIDs.end())
-		{
-			sum++;
-		}
-	}
-
-	//std::println("{}",input);
-	return sum;
-}
-
-
-long long part2(const std::string& input)
-{
-	std::vector<FreshIDRange> freshIDs{};
-
-	using namespace std::views;
-
-	auto notEmptyline = [](auto line) {return std::ranges::distance(line) != 0; };
-	auto toInt = [](auto line) {return std::stoll(std::string(std::string_view(line))); };
-
+	auto toInt = [](auto line) {return aoc::svto<long long>(std::string_view(line)); };
 
 	for (const auto& line : input
 		| std::views::split('\n')
@@ -77,7 +34,7 @@ long long part2(const std::string& input)
 	}
 
 	if (freshIDs.empty())
-		return 0;
+		return {};
 
 	std::ranges::sort(freshIDs, {}, &FreshIDRange::firstID);
 
@@ -96,22 +53,53 @@ long long part2(const std::string& input)
 			cleanFreshIDs.push_back(range);
 		}
 	}
+	return cleanFreshIDs;
+}
+
+constexpr long long part1(const std::string& input)
+{
+	using namespace std::views;
+
+	 auto notEmptyline = [](auto line) {return std::ranges::distance(line) != 0; };
+	 auto toInt = [](auto line) {return aoc::svto<long long>(std::string_view(line)); };
+
+	const std::vector<FreshIDRange> freshIDs{ createMergedRages(input) };
+	long long sum{ 0 };
+	for (const auto& id : input | split('\n')
+		| drop_while(notEmptyline)
+		| drop(1)
+		| transform(toInt))
+	{
+		auto it = std::ranges::find_if(freshIDs, [id](const FreshIDRange& range)
+			{
+				return id >= range.firstID && id <= range.lastID;
+			});
+		if (it != freshIDs.end())
+		{
+			sum++;
+		}
+	}
+	return sum;
+}
+
+
+constexpr long long part2(const std::string& input)
+{
+	const std::vector<FreshIDRange> cleanFreshIDs{ createMergedRages(input)};
 
 	long long  sum = 0;
 	for (const auto range : cleanFreshIDs)
 	{
 		sum += range.lastID - range.firstID + 1;
 	}
-
-	//std::println("{}",input);
 	return  sum;
 }
 
 void day05()
 {
 	// Tests
-   /* static_assert(part1("L68\nL30\nR48\nL5\nR60\nL55\nL1\nL99\nR14\nL82") == 3);
-	static_assert(part2("L68\nL30\nR48\nL5\nR60\nL55\nL1\nL99\nR14\nL82") == 6);*/
+    static_assert(part1("3-5\n10-14\n16-20\n12-18\n\n1\n5\n8\n11\n17\n32") == 3ll);
+	static_assert(part2("3-5\n10-14\n16-20\n12-18\n\n1\n5\n8\n11\n17\n32") == 14ll);
 
 
 	auto input = aoc::readInput(std::filesystem::path("day05.txt"));
